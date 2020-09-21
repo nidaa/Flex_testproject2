@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!---
+     <p>This application demonstrates a simple Create, Read, Update, and Delete
+       (CRUD) example using Java Enterprise Edition (JEE) 5, using Hibernate
+       3.x with Java Persistence API (JPA), BlazeDS, and Flex 4.</p>
+     <p>Some of the references used to make this MXML file:</p>
+     <ul>
+       <li><a href="http://livedocs.adobe.com/flex/3/html/help.html?content=layouts_08.html">
+         Form, FormHeading, and FormItem layout containers</a></li>
+       <li><a href="http://livedocs.adobe.com/flex/3/langref/mx/validators/Validator.html">
+         Flex 3.5 Validator</a></li>
+      <li><a href="http://www.adobe.com/devnet/flex/quickstart/handling_events/">
+         Flex Quick Start: Getting started - Events</a></li>
+      <li><a href="http://opensource.adobe.com/wiki/display/flexsdk/ASDoc+in+MXML">
+         ASDoc in MXML - Functional and Design Specification</a></li>
+      <li><a href="http://help.adobe.com/en_US/Flex/4.0/html/WSda78ed3a750d6b8f4ce729f5121efe6ca1b-8000.html">
+         Using the asdoc task</a></li>
+      <li><a href="http://livedocs.adobe.com/flex/3/html/help.html?content=asdoc_6.html">
+         ASDoc tags</a></li>
+      <li><a href="http://www.adobe.com/devnet/flex/quickstart/validating_data/">
+         Flex Quick Start: Handling data</a></li>
+      <li><a href="http://www.adobe.com/devnet/actionscript/articles/actionscript_tips.html">
+         Tips for learning ActionScript 3.0</a></li>
+      <li><a href="http://elromdesign.com/blog/2009/07/16/flex-data-binding-pitfalls-and-common-misuse-mistakes/">
+         Flex data binding five common misuse mistakes</a></li>
+      <li><a href="http://livedocs.adobe.com/flex/3/html/help.html?content=metadata_3.html#159635">
+         Metadata tags </a></li>
+     <li><a href="http://livedocs.adobe.com/flex/3/html/help.html?content=dpcontrols_5.html">
+       ComboBox control</a></li>
+     <li><a href="http://livedocs.adobe.com/flex/3/langref/mx/controls/ComboBox.html">
+       Adobe® Flex™ 3.5 Language Reference - ComboBox</a></li>
+     <li><a href="http://livedocs.adobe.com/flex/3/langref/mx/collections/ArrayCollection.html">
+       Adobe® Flex™ 3.5 Language Reference - ArrayCollection</a></li>
+     <li><a href="http://www.adobe.com/livedocs/flex/2/langref/mx/controls/DataGrid.html">
+       Adobe® Flex™ 2 Language Reference - DataGrid</a></li>
+     <li><a href="">
+       </a></li>
+     <li><a href="">
+       </a></li>
+     </ul>
+  -->
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml"
+  xmlns:contact="bcit.contacts.*" creationComplete="initPage();"
+  layout="vertical" frameRate="30" pageTitle="Contacts Example"
+  horizontalAlign="center" verticalAlign="middle"
+  backgroundColor="#A9C0E7">
+
+  <mx:Style>
+    .mainBoxStyle {
+      borderStyle: solid;
+      paddingTop: 5px;
+      paddingBottom: 5px;
+      paddingLeft: 5px;
+      paddingRight: 5px;
+    }
+
+    .textMessages {
+      fontWeight: bold;
+    }
+  </mx:Style>
+
+
+  <mx:RemoteObject id="remotingService" showBusyCursor="false"
+    destination="contacts" fault="handleFault(event);"
+    result="handleResult(event);"/>
+
+  <mx:Script>
+    <![CDATA[
+
+        import mx.rpc.events.FaultEvent;
+        import mx.rpc.events.ResultEvent;
+        import mx.collections.ArrayCollection;
+        import bcit.contacts.dto.Contact;
+
+        [Bindable]
+        private var contacts:ArrayCollection = new ArrayCollection();
+
+        // For more on the Bindable metadata tag, see the devguide_flex3.pdf
+        // document, page 1249 (1257 in PDF page numbering)
+        [Bindable]
+        private var message:String = "Status: Ready";
+
+        private var contact:Contact;
+
+        public function setControlBarValid(valid:Boolean):void {
+            if(valid) {
+                // if the selected item is -1, then no item is selected but at
+                // the same time the fields are valid which means the user chose
+                // to add a contact, not update one
+                if(contactsDataGrid.selectedIndex == -1) {
+                    createButton.enabled = valid;
+                } else {
+                    editButton.enabled = valid;
+                }
+              } else {
+                  // else nothing is valid
+                  createButton.enabled = false;
+                  editButton.enabled = false;
+            }
+        }
+
+        private function initPage():void {
+            editContactForm.setApp(this);
+            contact = new Contact();
+            getAllContacts();
+            resetPage();
+        }
+
+        private function createContact():void {
+            contact = editContactForm.getContact();
+            remotingService.addContact(contact);
+            message = "Status: Contact Added";
+            getAllContacts();
+        }
+
+        private function editContact():void {
+            var id:Number = contact.id;
+            contact = editContactForm.getContact();
+            contact.id = id;
+            remotingService.editContact(contact);
+            message = "Status: Contact Edited";
+            getAllContacts();
+        }
+
+        private function deleteContact():void {
+            if(contactsDataGrid.selectedItem != null) {
+                var c:Contact = contactsDataGrid.selectedItem as Contact;
+                // no sense in sending the whole contact - just send the id
+                // to cut down on bandwidth
+                remotingService.deleteContact(c.id);
+                message = "Status: Contact Deleted";
+            }
+            getAllContacts();
+        }
+
+        private function getAllContacts():void {
+            loadButton.enabled = false;
+            remotingService.getContacts();
+            loadButton.enabled = true;
+            resetPage();
+        }
+
+        private function populateFormWithContact():void {
+            contact = contactsDataGrid.selectedItem as Contact;
+            editContactForm.setContact(contact);
+            editButton.enabled = true;
+            deleteButton.enabled = true;
+        }
+
+        private function resetPage():void {
+            editContactForm.clearForm();
+            contact = new Contact();
+            createButton.enabled = false;
+            editButton.enabled = false;
+            deleteButton.enabled = false;
+            contactsDataGrid.selectedIndex = -1;
+        }
+
+        private function handleFault(e:FaultEvent):void {
+            message = "Status: Error"
+                + "\nFault code: " + e.fault.faultCode
+                + "\nFault detail: " + e.fault.faultDetail
+                + "\nFault string: " + e.fault.faultString;
+        }
+
+        private function handleResult(e:ResultEvent):void {
+            // can get the results by accessing e.result property
+            //mx.controls.Alert.show(e.toString());
+            contacts = e.result as ArrayCollection;
+            var number:int = contacts.length;
+            //if(number == 1) {
+            //    message = "Status: Retrieved 1 contact";
+            //} else {
+            //    message = "Status: Retrieved " + contacts.length + " contacts";
+            //}
+        }
+
+    ]]>
+  </mx:Script>
+
+  <mx:VBox styleName="mainBoxStyle">
+
+    <mx:Text id="titleText" text="Single click to select a contact"/>
+
+    <contact:ContactsDataGrid id="contactsDataGrid" dataProvider="{contacts}"
+      itemClick="populateFormWithContact();"
+      doubleClick="populateFormWithContact();"/>
+
+    <contact:EditContactForm id="editContactForm"/>
+
+    <mx:ControlBar horizontalAlign="center">
+      <mx:Button label="List" id="loadButton" click="getAllContacts()"
+        toolTip="Retrieve contacts from the server"/>
+      <mx:Button label="Add" id="createButton" click="createContact()"
+        toolTip="Create a new contact"/>
+      <mx:Button label="Update" id="editButton" click="editContact()"
+        toolTip="Edit a selected contact"/>
+      <mx:Button label="Delete" id="deleteButton" click="deleteContact()"
+        toolTip="Delete a selected contact"/>
+      <mx:Button label="Clear Form" id="clearButton" click="resetPage()"
+        toolTip="Clear the form"/>
+    </mx:ControlBar>
+
+    <mx:TextArea text="{message}" styleName="textMessages" wordWrap="true"
+      verticalScrollPolicy="auto" horizontalScrollPolicy="off" editable="false"
+      width="100%"/>
+
+  </mx:VBox>
+
+</mx:Application>

@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!---
+   <p></p>
+  -->
+<mx:Form xmlns:mx="http://www.adobe.com/2006/mxml">
+
+  <mx:Script>
+    <![CDATA[
+        import mx.validators.Validator;
+        import bcit.contacts.dto.Contact;
+
+        private var app:ContactsApp;
+
+        public function setApp(application:ContactsApp):void {
+            app = application;
+        }
+
+        public function setContact(contact:Contact):void {
+            cfirstName.text = contact.firstName;
+            clastName.text = contact.lastName;
+            cemail.text = contact.emailAddress;
+            cphone.text = contact.phoneNumber;
+        }
+
+        public function getContact():Contact {
+            var contact:Contact = new Contact();
+            contact.id = -1;
+            contact.firstName = cfirstName.text;
+            contact.lastName = clastName.text;
+            contact.emailAddress = cemail.text;
+            contact.phoneNumber = cphone.text;
+            return contact;
+        }
+
+        public function clearForm():void {
+            cfirstName.text = "";
+            clastName.text = "";
+            cemail.text = "";
+            cphone.text = "";
+        }
+
+        private function validateForm(e:Event):void {
+            var valid:Boolean =
+                (Validator.validateAll([emailValidator, phoneValidator,
+                    firstnameValidator, lastnameValidator]).length == 0);
+
+            // form is valid, now decide whether to add or update
+            app.setControlBarValid(valid);
+        }
+
+    ]]>
+  </mx:Script>
+
+
+  <mx:EmailValidator id="emailValidator" source="{cemail}"
+    property="text" required="true"/>
+  <mx:PhoneNumberValidator id="phoneValidator" source="{cphone}"
+    property="text" required="true"/>
+  <mx:StringValidator id="firstnameValidator" source="{cfirstName}"
+    property="text" minLength="2" required="true"/>
+  <mx:StringValidator id="lastnameValidator" source="{clastName}"
+    property="text" minLength="2" required="true"/>
+
+
+  <mx:FormHeading label="Enter Contact Info:"/>
+
+  <mx:FormItem label="First Name:" required="true">
+    <mx:TextInput id="cfirstName" change="validateForm(event);"/>
+  </mx:FormItem>
+
+  <mx:FormItem label="Last Name:" required="true">
+    <mx:TextInput id="clastName" change="validateForm(event);"/>
+  </mx:FormItem>
+
+  <mx:FormItem label="Email Address:" required="true">
+    <mx:TextInput id="cemail" change="validateForm(event);"/>
+  </mx:FormItem>
+
+  <mx:FormItem label="Phone Number:" required="true">
+    <mx:TextInput id="cphone" change="validateForm(event);"/>
+  </mx:FormItem>
+
+
+
+</mx:Form>
+

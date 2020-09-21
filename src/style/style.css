@@ -1,0 +1,18 @@
+p {
+  text-align: center;
+}
+
+.swfContentPane {
+  position: relative;
+  border: 1px solid black;
+  margin: 0 auto;
+  width: 600px;
+  height: 540px;
+}
+
+.errormessages
+{
+  color: rgb(255, 68, 0);
+  font-weight: bold;
+  padding-left: 0.5em;
+}
