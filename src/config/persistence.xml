@@ -1,0 +1,65 @@
+<persistence version="1.0" xmlns="http://java.sun.com/xml/ns/persistence"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_1_0.xsd">
+  <!-- Adapted from: https://www.hibernate.org/114.html, Hibernate Web site -->
+  <!-- Don't forget to turn on your MySQL server on in your OS and also remember
+       to set up your DB by:
+       1) logging into MySQL
+       2) create a DB by typing (within the MySQL command line utility):
+          create database contacts;
+       3) If you want to see that you've created this DB, type:
+          (within the MySQL command line utility):
+          show contacts;
+          use contacts;
+          show tables;
+          select * from contact;
+       4) To delete all records from the table and start again, type:
+          delete from contact;
+       5) If you want to export what DDL statements are required to
+          create the generated DB, you can type:
+          mysqldump {dash-dash}user=root {dash-dash}password=root {dash-dash}no-data > script_file.sql
+          Assuming your DB has an account called 'root' with a password
+          of 'root'
+          Note: Replace {dash dash} with two dashes - XML parsers do not
+          like double dashes inside comments due to it's significance as a comment)
+       References:
+         http://www.webdevelopersnotes.com/tutorials/sql/mysql_primer_creating_a_database.php3
+         http://dev.mysql.com/doc/refman/5.1/en/mysqldump.html
+    -->
+  <persistence-unit name="contacts" transaction-type="RESOURCE_LOCAL">
+    <properties>
+
+      <property name="hibernate.dialect" value="org.hibernate.dialect.MySQLDialect" />
+      <property name="hibernate.default_schema" value="contacts" />
+      <property name="hibernate.connection.driver_class" value="com.mysql.jdbc.Driver" />
+      <property name="hibernate.connection.url" value="jdbc:mysql://localhost:3306/contacts" />
+      <!-- Scan for annotated classes and Hibernate mapping XML files -->
+      <property name="hibernate.archive.autodetection" value="class, hbm"/>
+      <property name="hibernate.connection.username" value="root"/>
+      <property name="hibernate.connection.password" value="root"/>
+
+      <!-- Use the C3P0 connection pool. -->
+      <property name="hibernate.c3p0.min_size" value="3" />
+      <property name="hibernate.c3p0.max_size" value="90" />
+      <property name="hibernate.c3p0.timeout" value="100" />
+
+      <!-- Disable second-level cache. -->
+      <property name="hibernate.cache.provider_class" value="org.hibernate.cache.NoCacheProvider" />
+      <!--<property name="hibernate.cache.use_query_cache" value="false" />
+      <property name="hibernate.cache.use_minimal_puts" value="false" />
+      <property name="hibernate.max_fetch_depth" value="3" />-->
+
+      <!-- Print SQL to stdout. -->
+      <property name="hibernate.show_sql" value="false"/>
+      <property name="hibernate.format_sql" value="false"/>
+       <property name="hibernate.comment_sql" value="false"/>
+
+      <!-- Drop and then re-create schema on SessionFactory build, for testing. -->
+      <property name="hibernate.hbm2ddl.auto" value="update" />
+
+      <!-- Bind the getCurrentSession() method to the thread. -->
+      <property name="current_session_context_class" value="thread" />
+
+    </properties>
+  </persistence-unit>
+</persistence>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- References:
+     http://www.flexlive.net/?p=92
+     http://www.jamesward.com/census/
+  -->
+<service id="remoting-service"
+  class="flex.messaging.services.RemotingService">
+
+  <adapters>
+    <adapter-definition id="java-object" default="true"
+      class="flex.messaging.services.remoting.adapters.JavaAdapter"/>
+  </adapters>
+
+  <default-channels>
+    <channel ref="contacts-amf"/>
+  </default-channels>
+
+  <destination id="contacts">
+    <properties>
+      <source>bcit.contacts.ContactsService</source>
+      <!--<scope>application</scope>-->
+    </properties>
+  </destination>
+
+</service>
